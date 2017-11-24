@@ -4,8 +4,8 @@ close all
 settings = prepareWorkspace;
 settings.force = true;
 
-list = dir([pwd '/**/Raw Data/**/*.nd']);
-
+%list = dir(['D:/wingdischeights' '/**/Raw Data/**/*.nd']);
+list = dir(['D:/imaging/Staining' '/**/raw data/**/*.nd']);
 pathList = {};
 j = 1;
 for i = 1:length(list)
