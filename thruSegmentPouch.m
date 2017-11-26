@@ -96,8 +96,8 @@ for i = 1:(size(dataTable, 1))%%randperm(size(dataTable, 1))
     if flag == 1
         continue
     end
-    IN = inpolygon(ptsAP(:,1),ptsAP(:,2),ptsPouch(1,:),ptsPouch(2,:));
-    ptsAP(~IN,:) = [];
+%     IN = inpolygon(ptsAP(:,1),ptsAP(:,2),ptsPouch(1,:),ptsPouch(2,:));
+%     ptsAP(~IN,:) = [];
     
     % Segment D/V axis
     flag = 2;
@@ -132,8 +132,8 @@ for i = 1:(size(dataTable, 1))%%randperm(size(dataTable, 1))
     if flag == 1
         continue
     end
-    IN = inpolygon(ptsDV(:,1),ptsDV(:,2),ptsPouch(1,:),ptsPouch(2,:));
-    ptsDV(~IN,:) = [];
+%     IN = inpolygon(ptsDV(:,1),ptsDV(:,2),ptsPouch(1,:),ptsPouch(2,:));
+%     ptsDV(~IN,:) = [];
     
    save(strcat(CurrentFile,'.mat'), 'ptsAP','ptsDV','-append');
     end
