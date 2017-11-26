@@ -1,50 +1,50 @@
-%% Initialization
-clearvars
-close all
-
-settings = prepareWorkspace;
-dataTable = getLabels(settings);
-category = categorical(dataTable.Category);
-
-% up to here everything works (DO NOT CHANGE Previous code)
-
-%  keep = category==categorical({'ms1096-RyR-RNAi'}) | ...%%%%%%%%%%%%%%    
-%     category==categorical({'ms1096-plc21c-RNAi'}) | ...%;%%%%%%%%%%%%%%%%
-%     category==categorical({'ms1096-IP3R RNAi phospho myosin II'}) | ...
-%     category==categorical({'ms1096-SERCA RNAi phospho Myosin II'});
-% % keep([4,21,22,26,28:40,42]) = 0;
-% % % keep = logical(keep * 0);
-% % % keep([1:5]) = 1;
-% % dataTable([1,9,12,16,20,23,25,28,30],:) = [];%16,20,30
-% dataTable = dataTable(keep,:); %%%%%%%%%%%%%%%%%%
-% 
-% %dataTable = dataTable([end],:);
-% %dataTable = dataTable([1],:);%5,7,10,11,17,19,29
-% 
-% % good ones
-% dataTable = dataTable([1,2,6,7,9,23,(25:41),43,(46:49),(52:56),(58:61),(63:64)], :);
-% %%dataTable([1,20,23,24,30,32,34,38],:) = []; % 23, 24, 30, 34, & ... did not work
-% %dataTable = dataTable([20,23,24,30,33], :);
-% % % dataTable = dataTable([2,7,14,23,25,26,28,30,31,32,36,37,38,40,41,42], :);
-% % % dataTable = dataTable([1,3,5,6,8,12,14,15,16], :);
-% % % dataTable([25,26,40],:) = [];
-
-settings.xyN = 500;
-settings.force = true;
-settings.crossType = 'Developmental';
-% dataTable = dataTable(round(rand(1) * 100),:);
-
-%% Semiautomated data processing
-warning('Data must be converted into .mat files for this to work')
-thruSegmentPouch(dataTable, settings); % manual segmentation of axes and pouch
-thruMakeSlices(dataTable, settings); % automatically make orthogonal projections
-% thruSegmentCrossection(dataTable, settings); % manual segmentation of cross sections
-% thruDrawLines(dataTable, settings); % manual determination of cross section orientation
-% thruAnalyzeCuts(dataTable, settings); % automatic extraction of height profiles
-% defineIntersection(dataTable, settings); % manual determination of AP & DV intersection
-getOrganizedProjections(dataTable, settings); % automatic compilation of high resolution z-stacks & orthogonal projections
-% updateAxis(dataTable, settings)
-% exportAPDV(dataTable, settings) % automatic generation of data sheets
+% % % %% Initialization
+% % % clearvars
+% % % close all
+% % % 
+% % % settings = prepareWorkspace;
+% % % dataTable = getLabels(settings);
+% % % category = categorical(dataTable.Category);
+% % % dataTable = dataTable(1,:); % test
+% % % % up to here everything works (DO NOT CHANGE Previous code)
+% % % 
+% % % %  keep = category==categorical({'ms1096-RyR-RNAi'}) | ...%%%%%%%%%%%%%%    
+% % % %     category==categorical({'ms1096-plc21c-RNAi'}) | ...%;%%%%%%%%%%%%%%%%
+% % % %     category==categorical({'ms1096-IP3R RNAi phospho myosin II'}) | ...
+% % % %     category==categorical({'ms1096-SERCA RNAi phospho Myosin II'});
+% % % % % keep([4,21,22,26,28:40,42]) = 0;
+% % % % % % keep = logical(keep * 0);
+% % % % % % keep([1:5]) = 1;
+% % % % % dataTable([1,9,12,16,20,23,25,28,30],:) = [];%16,20,30
+% % % % dataTable = dataTable(keep,:); %%%%%%%%%%%%%%%%%%
+% % % % 
+% % % % %dataTable = dataTable([end],:);
+% % % % %dataTable = dataTable([1],:);%5,7,10,11,17,19,29
+% % % % 
+% % % % % good ones
+% % % % dataTable = dataTable([1,2,6,7,9,23,(25:41),43,(46:49),(52:56),(58:61),(63:64)], :);
+% % % % %%dataTable([1,20,23,24,30,32,34,38],:) = []; % 23, 24, 30, 34, & ... did not work
+% % % % %dataTable = dataTable([20,23,24,30,33], :);
+% % % % % % dataTable = dataTable([2,7,14,23,25,26,28,30,31,32,36,37,38,40,41,42], :);
+% % % % % % dataTable = dataTable([1,3,5,6,8,12,14,15,16], :);
+% % % % % % dataTable([25,26,40],:) = [];
+% % % 
+% % % settings.xyN = 500;
+% % % settings.force = true;
+% % % settings.crossType = 'Developmental';
+% % % % dataTable = dataTable(round(rand(1) * 100),:);
+% % % 
+% % % %% Semiautomated data processing
+% % % warning('Data must be converted into .mat files for this to work')
+% % % thruSegmentPouch(dataTable, settings); % manual segmentation of axes and pouch
+% % % thruMakeSlices(dataTable, settings); % automatically make orthogonal projections
+% % % % thruSegmentCrossection(dataTable, settings); % manual segmentation of cross sections
+% % % % thruDrawLines(dataTable, settings); % manual determination of cross section orientation
+% % % % thruAnalyzeCuts(dataTable, settings); % automatic extraction of height profiles
+% % % % defineIntersection(dataTable, settings); % manual determination of AP & DV intersection
+% % % %getOrganizedProjections(dataTable, settings); % automatic compilation of high resolution z-stacks & orthogonal projections
+% % % % updateAxis(dataTable, settings)
+exportAPDV(dataTable, settings) % automatic generation of data sheets
 % %getProjections(dataTable, settings)
 %% Visualization
 %%heightAP = nan(499,size(dataTable,1));

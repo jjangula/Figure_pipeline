@@ -160,6 +160,11 @@ while currkey==0
         currkey = 3;
     end
 end
+if currkey == 1 % added this if statement
+    flag = 1;
+    save(path, 'flag','-append');
+    stoploop = 0;
+end
 if currkey == 2
     flag = 0;
     save(path, 'flag','-append');

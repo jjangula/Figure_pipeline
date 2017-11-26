@@ -6,7 +6,7 @@ x = 0.3425;
 y = 0.3409;
 z = 1;
 clear scale
-% Hi!!!
+
 for i = [1]%length(paths):-1:1
     scale.x = x;
     scale.y = y;

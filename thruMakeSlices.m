@@ -6,18 +6,19 @@ function thruMakeSlices(dataTable, settings)
 % Loop over all of the selected datafiles
 for i = 1:size(dataTable, 1)
     i
+    CurrentFile = strcat(dataTable.Path{i},'\',dataTable.Label{i});
     % Skip the analysis if processing has already occurred
     if strcmp(settings.crossType, 'Developmental')
-    alreadyExists = matFileExists(dataTable.Path{i}, {'crossAP','crossDV','AP0','DV0','crossLong','crossShort','coordLong','coordShort','Centroid'});
+    alreadyExists = matFileExists(CurrentFile, {'crossAP','crossDV','AP0','DV0','crossLong','crossShort','coordLong','coordShort','Centroid'});
     else
-    alreadyExists = matFileExists(dataTable.Path{i}, {'crossLong','crossShort','coordLong','coordShort','Centroid'});
+    alreadyExists = matFileExists(CurrentFile, {'crossLong','crossShort','coordLong','coordShort','Centroid'});
     end
     if alreadyExists && ~settings.force
         continue
     end
     
     disp(['Processing ' dataTable.Label{i}])
-    data = load(dataTable.Path{i}, 'ptsPouch', 'ptsAP','ptsDV','hyperstack');
+    data = load(strcat(CurrentFile,'.mat'), 'ptsPouch', 'ptsAP','ptsDV','hyperstack');
     
     % Obtain relevant axes region
     pouchMask = poly2mask(data.ptsPouch(1,:),data.ptsPouch(2,:),size(data.hyperstack,1),size(data.hyperstack,2));
@@ -61,7 +62,7 @@ for i = 1:size(dataTable, 1)
     ptsDV(max(unique(max(IDX))),:) = p(1,:);
     
     midDV = max(unique(max(IDX)));
-     save(dataTable.Path{i}, 'crossAP','crossDV','AP0','DV0','DV0','midAP','midDV','ptsAP','ptsDV','-append');
+     save(strcat(CurrentFile,'.mat'), 'crossAP','crossDV','AP0','DV0','DV0','midAP','midDV','ptsAP','ptsDV','-append');
     end
     % Obtain cross section of long and short axis
     stats = regionprops(pouchMask, 'Centroid', 'Orientation');
@@ -72,7 +73,7 @@ for i = 1:size(dataTable, 1)
     [crossShort, coordShort] = findCrossSections(lineShort,data.hyperstack,pouchPoly');    
     Centroid = stats.Centroid;
     
-    save(dataTable.Path{i}, 'crossLong','crossShort','coordLong','coordShort','Centroid','-append')
+    save(strcat(CurrentFile,'.mat'), 'crossLong','crossShort','coordLong','coordShort','Centroid','-append')
    
 end
 
