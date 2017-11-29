@@ -40,12 +40,9 @@ function exportAPDV(dataTable, settings)
 
 %% Export Data
 for k = 1:size(dataTable,1)
+    clear zProjection crossAP crossDV ptsAP ptsDV ptsPouch IAP IDV cross_AP cross_DV    
     dataTable.Label{k}
     CurrentFile = strcat(dataTable.Path{k},'\',dataTable.Label{k});
-% %     alreadyExists = matFileExists(CurrentFile, {'zProjection','crossDV','crossAP','scale'});
-% %     if ~alreadyExists
-% %         continue
-% %     end
     
     data = load(strcat(CurrentFile,'.mat'),'crossAP','crossDV','ptsPouch','zProjection','scale','ptsAP','ptsDV','AP0','DV0','midAP','midDV','Centroid');
     if data.scale.z == 0
@@ -54,8 +51,7 @@ for k = 1:size(dataTable,1)
     
     data.scale.x = 0.34;
     data.scale.y = 0.34;
-    
-    clear zProjection crossAP crossDV ptsAP ptsDV ptsPouch IAP IDV Ecadherin AX cross_AP cross_DV
+    data.scale.z = 1;
     
     IAP = find(data.ptsAP(:,1) == 0);
     IDV = find(data.ptsDV(:,1) == 0);
@@ -63,129 +59,343 @@ for k = 1:size(dataTable,1)
     data.ptsAP(IAP, :) = [];
     data.ptsDV(IDV, :) = [];
     
-    if size(data.zProjection, 4) == 4
-        Ecadherin = squeeze(data.zProjection(:,:,:,4));
-    end
+%     for q = 1:4
+%     zProjection(:,:,q) = data.zProjection(:,:,:,1) .* 0;
+%     crossAP = squeeze(data.zProjection) .* 0;
 
-    zProjection(:,:,1) = mat2gray(data.zProjection(:,:,:,1));
-    zProjection(:,:,2) = mat2gray(data.zProjection(:,:,:,2));
-    zProjection(:,:,3) = mat2gray(data.zProjection(:,:,:,3));
-    zProjection(:,:,4) = mat2gray(data.zProjection(:,:,:,4));
+    ChN = 1; % Current channel number
     
-    figure(1)
+    if ~isempty(dataTable.CH1{k}) 
+        zProjection(:,:,1) = mat2gray(data.zProjection(:,:,:,ChN));
+        z_Projection(:,:,1) = imresize(zProjection(:,:,ChN), [(size(zProjection, 1) * data.scale.x), size(zProjection, 2) * data.scale.y]);
+        crossAP(:,:,1) = mat2gray(data.crossAP(:,:,ChN));
+        cross_AP(:,:,1) = imresize(crossAP(:,:,ChN), [(size(crossAP, 1) * data.scale.z), size(crossAP, 2) * data.scale.y]);
+        crossDV(:,:,1) = mat2gray(data.crossDV(:,:,ChN));
+        cross_DV(:,:,1) = imresize(crossDV(:,:,ChN), [size(crossDV, 1)* data.scale.z, size(crossDV, 2)*data.scale.y]);
+        
+        ChN = ChN + 1;
+    end
+    if ~isempty(dataTable.CH2{k})
+        zProjection(:,:,2) = mat2gray(data.zProjection(:,:,:,ChN));
+        z_Projection(:,:,2) = imresize(zProjection(:,:,2), [(size(zProjection, 1) * data.scale.x), size(zProjection, 2) * data.scale.y]);
+        crossAP(:,:,2) = mat2gray(data.crossAP(:,:,ChN));
+        cross_AP(:,:,2) = imresize(crossAP(:,:,2), [(size(crossAP, 1) * data.scale.z), size(crossAP, 2) * data.scale.y]);
+        crossDV(:,:,2) = mat2gray(data.crossDV(:,:,ChN));
+        cross_DV(:,:,2) = imresize(crossDV(:,:,2), [size(crossDV, 1)* data.scale.z, size(crossDV, 2)*data.scale.y]);
+        
+        ChN = ChN + 1;
+    end
+    if ~isempty(dataTable.CH3{k})
+        zProjection(:,:,3) = mat2gray(data.zProjection(:,:,:,ChN));
+        z_Projection(:,:,3) = imresize(zProjection(:,:,3), [(size(zProjection, 1) * data.scale.x), size(zProjection, 2) * data.scale.y]);
+        crossAP(:,:,3) = mat2gray(data.crossAP(:,:,ChN));
+        cross_AP(:,:,3) = imresize(crossAP(:,:,3), [(size(crossAP, 1) * data.scale.z), size(crossAP, 2) * data.scale.y]);
+        crossDV(:,:,3) = mat2gray(data.crossDV(:,:,ChN));
+        cross_DV(:,:,3) = imresize(crossDV(:,:,3), [size(crossDV, 1)* data.scale.z, size(crossDV, 2)*data.scale.y]);
+        
+        ChN = ChN + 1;
+    end
+    if ~isempty(dataTable.CH4{k})
+        zProjection(:,:,4) = mat2gray(data.zProjection(:,:,:,ChN));
+        z_Projection(:,:,4) = imresize(zProjection(:,:,4), [(size(zProjection, 1) * data.scale.x), size(zProjection, 2) * data.scale.y]);
+        crossAP(:,:,4) = mat2gray(data.crossAP(:,:,ChN));
+        cross_AP(:,:,4) = imresize(crossAP(:,:,4), [(size(crossAP, 1) * data.scale.z), size(crossAP, 2) * data.scale.y]); 
+        crossDV(:,:,4) = mat2gray(data.crossDV(:,:,ChN));
+        cross_DV(:,:,4) = imresize(crossDV(:,:,4), [size(crossDV, 1)* data.scale.z, size(crossDV, 2)*data.scale.y]);
+    end
+                
+    figure('units','inches','InnerPosition',[22 0.5 8.5 11.5], 'OuterPosition',[21,0,9,12])
     clf
     set(gcf,'color','w')
     ptsAP = data.ptsAP * data.scale.x;
     ptsDV = data.ptsDV * data.scale.x;
     ptsPouch = data.ptsPouch * data.scale.x;
     
-    subplot(4,4,1);
-    imshow(zProjection(:,:,1),'XData', 0:25:175.43, 'YData', 0:.25:174.55)
-    hold on
-    plot(ptsAP(:,1),ptsAP(:,2), 'c-', 'LineWidth',0.2);
-    plot(ptsDV(:,1),ptsDV(:,2), 'm-', 'LineWidth',0.2);
-    plot(ptsAP(1,1),ptsAP(1,2), 'b.');
-    plot(ptsDV(1,1),ptsDV(1,2), 'b.');
-    plot(ptsPouch(1,[1:end,1]),ptsPouch(2,[1:end,1]),'r-', 'LineWidth',0.2);
-    title(['Z ' dataTable.CH1{k}])
- 
-    subplot(4,4,2);
-    imshow(zProjection(:,:,2),'XData', 0:25:175.43, 'YData', 0:.25:174.55)
-    hold on
-    plot(ptsAP(:,1),ptsAP(:,2), 'c-', 'LineWidth',0.2);
-    plot(ptsDV(:,1),ptsDV(:,2), 'm-', 'LineWidth',0.2);
-    plot(ptsAP(1,1),ptsAP(1,2), 'b.');
-    plot(ptsDV(1,1),ptsDV(1,2), 'b.');
-    plot(ptsPouch(1,[1:end,1]),ptsPouch(2,[1:end,1]),'r-', 'LineWidth',0.2);
-    title(['Z ' dataTable.CH2{k}])
+    n = size(data.zProjection,4); % number of channels imaged
+    N = 1; % subplot number: will vary depending on the number of channels used
+    Spac = 0.1/4; % Spacing of figures
+    W = 0.9/4; % Width of figures 
+    gap = W + Spac;
     
-    subplot(4,4,3);
-    imshow(zProjection(:,:,3),'XData', 0:25:175.43, 'YData', 0:.25:174.55)
-    hold on
-    plot(ptsAP(:,1),ptsAP(:,2), 'c-', 'LineWidth',0.2);
-    plot(ptsDV(:,1),ptsDV(:,2), 'm-', 'LineWidth',0.2);
-    plot(ptsAP(1,1),ptsAP(1,2), 'b.');
-    plot(ptsDV(1,1),ptsDV(1,2), 'b.');
-    plot(ptsPouch(1,[1:end,1]),ptsPouch(2,[1:end,1]),'r-', 'LineWidth',0.2);
-    title(['Z ' dataTable.CH3{k}]) 
+    if ~isempty(dataTable.CH1{k})
+        subplot('Position',[0,1-W,W,W]);
+        imshow(z_Projection(:,:,1))%,'XData', 0:25:175.43, 'YData', 0:.25:174.55)
+        drawnow
+        hold on
+        plot(ptsAP(:,1),ptsAP(:,2), 'c-', 'LineWidth',0.2);
+        plot(ptsDV(:,1),ptsDV(:,2), 'm-', 'LineWidth',0.2);
+        plot(ptsAP(1,1),ptsAP(1,2), 'b.');
+        plot(ptsDV(1,1),ptsDV(1,2), 'b.');
+        plot(ptsPouch(1,[1:end,1]),ptsPouch(2,[1:end,1]),'r-', 'LineWidth',0.2);
+               
+        xlim = get(gca, 'xlim');      
+        ylim = get(gca, 'ylim');
+        text(xlim(1),ylim(1),dataTable.CH1{k},'FontSize',10,'Color','white','VerticalAlignment','top','HorizontalAlignment','left')
+        xgap = 0.05 * (xlim(2) - xlim(1));
+        ygap = 0.05 * (ylim(2) - ylim(1));
+        x = [xlim(2)-50-xgap,xlim(2)-xgap];
+        y = [ylim(2)-ygap, ylim(2)-ygap];
+        plot(x,y, 'w-', 'LineWidth', 3)
+        
+        N = N + 1;
+    end
     
-    subplot(4,4,4);
-    imshow(zProjection(:,:,4),'XData', 0:25:175.43, 'YData', 0:.25:174.55)
-    hold on
-    plot(ptsAP(:,1),ptsAP(:,2), 'c-', 'LineWidth',0.2);
-    plot(ptsDV(:,1),ptsDV(:,2), 'm-', 'LineWidth',0.2);
-    plot(ptsAP(1,1),ptsAP(1,2), 'b.');
-    plot(ptsDV(1,1),ptsDV(1,2), 'b.');
-    plot(ptsPouch(1,[1:end,1]),ptsPouch(2,[1:end,1]),'r-', 'LineWidth',0.2);
-    title(['Z ' dataTable.CH4{k}])
+    if ~isempty(dataTable.CH2{k})
+        subplot('Position',[gap,1-W,W,W]);
+        imshow(z_Projection(:,:,2))
+        hold on
+        plot(ptsAP(:,1),ptsAP(:,2), 'c-', 'LineWidth',0.2);
+        plot(ptsDV(:,1),ptsDV(:,2), 'm-', 'LineWidth',0.2);
+        plot(ptsAP(1,1),ptsAP(1,2), 'b.');
+        plot(ptsDV(1,1),ptsDV(1,2), 'b.');
+        plot(ptsPouch(1,[1:end,1]),ptsPouch(2,[1:end,1]),'r-', 'LineWidth',0.2);
+        
+        xlim = get(gca, 'xlim');
+        ylim = get(gca, 'ylim');
+        text(xlim(1),ylim(1),dataTable.CH2{k},'FontSize',10,'Color','white','VerticalAlignment','top','HorizontalAlignment','left')
+        xgap = 0.05 * (xlim(2) - xlim(1));
+        ygap = 0.05 * (ylim(2) - ylim(1));
+        x = [xlim(2)-50-xgap,xlim(2)-xgap];
+        y = [ylim(2)-ygap, ylim(2)-ygap];
+        plot(x,y, 'w-', 'LineWidth', 3)
+        
+        N = N + 1;
+    end
     
-    subplot(4,4,5);
-    imshow(zProjection(:,:,1),'XData', 0:25:175.43, 'YData', 0:.25:174.55)
-    title(['Z ' dataTable.CH1{k}])
- 
-    subplot(4,4,6);
-    imshow(zProjection(:,:,2),'XData', 0:25:175.43, 'YData', 0:.25:174.55)
-    title(['Z ' dataTable.CH2{k}])
+    if ~isempty(dataTable.CH3{k})
+        subplot('Position',[2*gap,1-W,W,W]);
+        imshow(z_Projection(:,:,3))
+        hold on
+        plot(ptsAP(:,1),ptsAP(:,2), 'c-', 'LineWidth',0.2);
+        plot(ptsDV(:,1),ptsDV(:,2), 'm-', 'LineWidth',0.2);
+        plot(ptsAP(1,1),ptsAP(1,2), 'b.');
+        plot(ptsDV(1,1),ptsDV(1,2), 'b.');
+        plot(ptsPouch(1,[1:end,1]),ptsPouch(2,[1:end,1]),'r-', 'LineWidth',0.2);
+        
+        xlim = get(gca, 'xlim');
+        ylim = get(gca, 'ylim');
+        text(xlim(1),ylim(1),dataTable.CH3{k},'FontSize',10,'Color','white','VerticalAlignment','top','HorizontalAlignment','left')
+        xgap = 0.05 * (xlim(2) - xlim(1));
+        ygap = 0.05 * (ylim(2) - ylim(1));
+        x = [xlim(2)-50-xgap,xlim(2)-xgap];
+        y = [ylim(2)-ygap, ylim(2)-ygap];
+        plot(x,y, 'w-', 'LineWidth', 3)
+        
+        N = N + 1;
+    end
     
-    subplot(4,4,7);
-    imshow(zProjection(:,:,3),'XData', 0:25:175.43, 'YData', 0:.25:174.55)
-    title(['Z ' dataTable.CH3{k}]) 
-    
-    subplot(4,4,8);
-    imshow(zProjection(:,:,4),'XData', 0:25:175.43, 'YData', 0:.25:174.55)
-    title(['Z ' dataTable.CH4{k}])
-       
-    crossAP(:,:,1) = mat2gray(data.crossAP(:,:,1));
-    crossAP(:,:,2) = mat2gray(data.crossAP(:,:,2));
-    crossAP(:,:,3) = mat2gray(data.crossAP(:,:,3));
-    crossAP(:,:,4) = mat2gray(data.crossAP(:,:,4));
-    
-    cross_AP(:,:,1) = imresize(crossAP(:,:,1), [(size(crossAP, 1) * data.scale.z), size(crossAP, 2) * data.scale.y]); %/ data.scale.y
-    cross_AP(:,:,2) = imresize(crossAP(:,:,2), [(size(crossAP, 1) * data.scale.z), size(crossAP, 2) * data.scale.y]);
-    cross_AP(:,:,3) = imresize(crossAP(:,:,3), [(size(crossAP, 1) * data.scale.z), size(crossAP, 2) * data.scale.y]);
-    cross_AP(:,:,4) = imresize(crossAP(:,:,4), [(size(crossAP, 1) * data.scale.z), size(crossAP, 2) * data.scale.y]);
+    if ~isempty(dataTable.CH4{k})
+        subplot('Position',[3*gap,1-W,W,W]);
+        imshow(z_Projection(:,:,4))
+        hold on
+        plot(ptsAP(:,1),ptsAP(:,2), 'c-', 'LineWidth',0.2);
+        plot(ptsDV(:,1),ptsDV(:,2), 'm-', 'LineWidth',0.2);
+        plot(ptsAP(1,1),ptsAP(1,2), 'b.');
+        plot(ptsDV(1,1),ptsDV(1,2), 'b.');
+        plot(ptsPouch(1,[1:end,1]),ptsPouch(2,[1:end,1]),'r-', 'LineWidth',0.2);
+        
+        xlim = get(gca, 'xlim');
+        ylim = get(gca, 'ylim');
+        text(xlim(1),ylim(1),dataTable.CH4{k},'FontSize',10,'Color','white','VerticalAlignment','top','HorizontalAlignment','left')
+        xgap = 0.05 * (xlim(2) - xlim(1));
+        ygap = 0.05 * (ylim(2) - ylim(1));
+        x = [xlim(2)-50-xgap,xlim(2)-xgap];
+        y = [ylim(2)-ygap, ylim(2)-ygap];
+        plot(x,y, 'w-', 'LineWidth', 3)
 
-    subplot(4,4,9);
-    imshow(cross_AP(:,:,1))
-    title(['AP ' dataTable.CH1{k}])
+        N = N + 1;
+    end
     
-    subplot(4,4,10);
-    imshow(cross_AP(:,:,2))
-    title(['AP ' dataTable.CH2{k}])
+    if ~isempty(dataTable.CH1{k})
+        subplot('Position',[0,1-W-gap,W,W]);
+        imshow(z_Projection(:,:,1));
+        hold on
+        xlim = get(gca, 'xlim');
+        ylim = get(gca, 'ylim');
+        text(xlim(1),ylim(1),dataTable.CH1{k},'FontSize',10,'Color','white','VerticalAlignment','top','HorizontalAlignment','left')
+        xgap = 0.05 * (xlim(2) - xlim(1));
+        ygap = 0.05 * (ylim(2) - ylim(1));
+        x = [xlim(2)-50-xgap,xlim(2)-xgap];
+        y = [ylim(2)-ygap, ylim(2)-ygap];
+        plot(x,y, 'w-', 'LineWidth', 3)
+
+        N = N + 1;
+    end
+
+    if ~isempty(dataTable.CH2{k})
+        subplot('Position',[gap,1-W-gap,W,W]);
+        imshow(z_Projection(:,:,2))%,'XData', 0:25:175.43, 'YData', 0:.25:174.55)
+        hold on
+        xlim = get(gca, 'xlim');
+        ylim = get(gca, 'ylim');
+        text(xlim(1),ylim(1),dataTable.CH2{k},'FontSize',10,'Color','white','VerticalAlignment','top','HorizontalAlignment','left')
+        xgap = 0.05 * (xlim(2) - xlim(1));
+        ygap = 0.05 * (ylim(2) - ylim(1));
+        x = [xlim(2)-50-xgap,xlim(2)-xgap];
+        y = [ylim(2)-ygap, ylim(2)-ygap];
+        plot(x,y, 'w-', 'LineWidth', 3)
+
+        N = N + 1;
+    end
     
-    subplot(4,4,11);
-    imshow(cross_AP(:,:,3))
-    title(['AP ' dataTable.CH3{k}])
+    if ~isempty(dataTable.CH3{k})
+        subplot('Position',[2*gap,1-W-gap,W,W]);
+        imshow(z_Projection(:,:,3))%,'XData', 0:25:175.43, 'YData', 0:.25:174.55)
+        hold on
+        xlim = get(gca, 'xlim');
+        ylim = get(gca, 'ylim');
+        text(xlim(1),ylim(1),dataTable.CH3{k},'FontSize',10,'Color','white','VerticalAlignment','top','HorizontalAlignment','left')
+        xgap = 0.05 * (xlim(2) - xlim(1));
+        ygap = 0.05 * (ylim(2) - ylim(1));
+        x = [xlim(2)-50-xgap,xlim(2)-xgap];
+        y = [ylim(2)-ygap, ylim(2)-ygap];
+        plot(x,y, 'w-', 'LineWidth', 3)
+
+        N = N + 1;
+    end
     
-    subplot(4,4,12);
-    imshow(cross_AP(:,:,4))
-    title(['AP ' dataTable.CH4{k}])
+    if ~isempty(dataTable.CH4{k})
+        subplot('Position',[3*gap,1-W-gap,W,W]);
+        imshow(z_Projection(:,:,4))%,'XData', 0:25:175.43, 'YData', 0:.25:174.55)
+        hold on
+        xlim = get(gca, 'xlim');
+        ylim = get(gca, 'ylim');
+        text(xlim(1),ylim(1),dataTable.CH4{k},'FontSize',10,'Color','white','VerticalAlignment','top','HorizontalAlignment','left')
+        xgap = 0.05 * (xlim(2) - xlim(1));
+        ygap = 0.05 * (ylim(2) - ylim(1));
+        x = [xlim(2)-50-xgap,xlim(2)-xgap];
+        y = [ylim(2)-ygap, ylim(2)-ygap];
+        plot(x,y, 'w-', 'LineWidth', 3)
+        hold on
+        N = N + 1;
+    end
     
-    crossDV(:,:,1) = mat2gray(data.crossDV(:,:,1));
-    crossDV(:,:,2) = mat2gray(data.crossDV(:,:,2));
-    crossDV(:,:,3) = mat2gray(data.crossDV(:,:,3));
-    crossDV(:,:,4) = mat2gray(data.crossDV(:,:,4));
+    if ~isempty(dataTable.CH1{k})
+        subplot('Position',[0,1-W-2*gap,W,W]);
+        imshow(cross_AP(:,:,1))
+        hold on
+        xlim = get(gca, 'xlim');
+        ylim = get(gca, 'ylim');
+        text(xlim(1),ylim(1),dataTable.CH1{k},'FontSize',10,'Color','white','VerticalAlignment','top','HorizontalAlignment','left')
+        xgap = 0.05 * (xlim(2) - xlim(1));
+        ygap = 0.05 * (ylim(2) - ylim(1));
+        x = [xlim(2)-50-xgap,xlim(2)-xgap];
+        y = [ylim(2)-ygap, ylim(2)-ygap];
+        plot(x,y, 'w-', 'LineWidth', 3)
+        title('AP bdry', 'FontSize', 12)
+
+        N = N + 1;
+    end
     
-    cross_DV(:,:,1) = imresize(crossDV(:,:,1), [size(crossDV, 1)* data.scale.z, size(crossDV, 2)*data.scale.y]);
-    cross_DV(:,:,2) = imresize(crossDV(:,:,2), [size(crossDV, 1)* data.scale.z, size(crossDV, 2)*data.scale.y]);
-    cross_DV(:,:,3) = imresize(crossDV(:,:,3), [size(crossDV, 1)* data.scale.z, size(crossDV, 2)*data.scale.y]);
-    cross_DV(:,:,4) = imresize(crossDV(:,:,4), [size(crossDV, 1)* data.scale.z, size(crossDV, 2)*data.scale.y]);
-   
-    subplot(4,4,13)
-    imshow(cross_DV(:,:,1))
-    title(['DV ' dataTable.CH1{k}])
+    if ~isempty(dataTable.CH2{k})
+        subplot('Position',[1*gap,1-W-2*gap,W,W]);
+        imshow(cross_AP(:,:,2))
+        hold on
+        xlim = get(gca, 'xlim');
+        ylim = get(gca, 'ylim');
+        text(xlim(1),ylim(1),dataTable.CH2{k},'FontSize',10,'Color','white','VerticalAlignment','top','HorizontalAlignment','left')
+        xgap = 0.05 * (xlim(2) - xlim(1));
+        ygap = 0.05 * (ylim(2) - ylim(1));
+        x = [xlim(2)-50-xgap,xlim(2)-xgap];
+        y = [ylim(2)-ygap, ylim(2)-ygap];
+        plot(x,y, 'w-', 'LineWidth', 3)
+
+        N = N + 1;
+    end
     
-    subplot(4,4,14);
-    imshow(cross_DV(:,:,2))
-    title(['DV ' dataTable.CH2{k}])
+    if ~isempty(dataTable.CH3{k})
+        subplot('Position',[2*gap,1-W-2*gap,W,W]);
+        imshow(cross_AP(:,:,3))
+        hold on
+        xlim = get(gca, 'xlim');
+        ylim = get(gca, 'ylim');
+        text(xlim(1),ylim(1),dataTable.CH3{k},'FontSize',10,'Color','white','VerticalAlignment','top','HorizontalAlignment','left')
+        xgap = 0.05 * (xlim(2) - xlim(1));
+        ygap = 0.05 * (ylim(2) - ylim(1));
+        x = [xlim(2)-50-xgap,xlim(2)-xgap];
+        y = [ylim(2)-ygap, ylim(2)-ygap];
+        plot(x,y, 'w-', 'LineWidth', 3)
+
+        N = N + 1;
+    end
     
-    subplot(4,4,15);
-    imshow(cross_DV(:,:,3))
-    title(['DV ' dataTable.CH3{k}])
+    if ~isempty(dataTable.CH4{k})
+        subplot('Position',[3*gap,1-W-2*gap,W,W]);
+        imshow(cross_AP(:,:,4))
+        hold on
+        xlim = get(gca, 'xlim');
+        ylim = get(gca, 'ylim');
+        text(xlim(1),ylim(1),dataTable.CH4{k},'FontSize',10,'Color','white','VerticalAlignment','top','HorizontalAlignment','left')
+        xgap = 0.05 * (xlim(2) - xlim(1));
+        ygap = 0.05 * (ylim(2) - ylim(1));
+        x = [xlim(2)-50-xgap,xlim(2)-xgap];
+        y = [ylim(2)-ygap, ylim(2)-ygap];
+        plot(x,y, 'w-', 'LineWidth', 3)
+
+        N = N + 1;
+    end
+
+    if ~isempty(dataTable.CH1{k})
+        subplot('Position',[0*gap,1-W-3*gap,W,W]);
+        imshow(cross_DV(:,:,1))
+        hold on
+        xlim = get(gca, 'xlim');
+        ylim = get(gca, 'ylim');
+        text(xlim(1),ylim(1),dataTable.CH1{k},'FontSize',10,'Color','white','VerticalAlignment','top','HorizontalAlignment','left')
+        xgap = 0.05 * (xlim(2) - xlim(1));
+        ygap = 0.05 * (ylim(2) - ylim(1));
+        x = [xlim(2)-50-xgap,xlim(2)-xgap];
+        y = [ylim(2)-ygap, ylim(2)-ygap];
+        plot(x,y, 'w-', 'LineWidth', 3)
+        title('DV bdry', 'FontSize', 12)
+        N = N + 1;
+    end
     
-    subplot(4,4,16);
-    imshow(cross_DV(:,:,4))
-    title(['DV ' dataTable.CH4{k}])
+    if ~isempty(dataTable.CH2{k})
+        subplot('Position',[1*gap,1-W-3*gap,W,W]);
+        imshow(cross_DV(:,:,2))
+        hold on
+        xlim = get(gca, 'xlim');
+        ylim = get(gca, 'ylim');
+        text(xlim(1),ylim(1),dataTable.CH2{k},'FontSize',10,'Color','white','VerticalAlignment','top','HorizontalAlignment','left')
+        xgap = 0.05 * (xlim(2) - xlim(1));
+        ygap = 0.05 * (ylim(2) - ylim(1));
+        x = [xlim(2)-50-xgap,xlim(2)-xgap];
+        y = [ylim(2)-ygap, ylim(2)-ygap];
+        plot(x,y, 'w-', 'LineWidth', 3)
+
+        N = N + 1;
+    end
+    
+    if ~isempty(dataTable.CH3{k})
+        subplot('Position',[2*gap,1-W-3*gap,W,W]);
+        imshow(cross_DV(:,:,3))
+        hold on
+        xlim = get(gca, 'xlim');
+        ylim = get(gca, 'ylim');
+        text(xlim(1),ylim(1),dataTable.CH3{k},'FontSize',10,'Color','white','VerticalAlignment','top','HorizontalAlignment','left')
+        xgap = 0.05 * (xlim(2) - xlim(1));
+        ygap = 0.05 * (ylim(2) - ylim(1));
+        x = [xlim(2)-50-xgap,xlim(2)-xgap];
+        y = [ylim(2)-ygap, ylim(2)-ygap];
+        plot(x,y, 'w-', 'LineWidth', 3)
+
+        N = N + 1;
+    end
+    
+    if ~isempty(dataTable.CH4{k})
+        subplot('Position',[3*gap,1-W-3*gap,W,W]);
+        imshow(cross_DV(:,:,4))
+        hold on
+        xlim = get(gca, 'xlim');
+        ylim = get(gca, 'ylim');
+        text(xlim(1),ylim(1),dataTable.CH4{k},'FontSize',10,'Color','white','VerticalAlignment','top','HorizontalAlignment','left')
+        xgap = 0.05 * (xlim(2) - xlim(1));
+        ygap = 0.05 * (ylim(2) - ylim(1));
+        x = [xlim(2)-50-xgap,xlim(2)-xgap];
+        y = [ylim(2)-ygap, ylim(2)-ygap];
+        plot(x,y, 'w-', 'LineWidth', 3)
+    end
     
     directory = dataTable.Path{k}(1:end-11);
     mkdir(directory, 'preliminary figures')

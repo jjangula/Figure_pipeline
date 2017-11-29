@@ -5,6 +5,7 @@
 function thruSegmentPouch(dataTable, settings)
 % Loop over all of the selected datafiles
 for i = 1:(size(dataTable, 1))%%randperm(size(dataTable, 1))
+    i
     dataTable.Label{i}
     CurrentFile = strcat(dataTable.Path{i},'\',dataTable.Label{i});
     % Skip the analysis if processing has already occurred
