@@ -49,6 +49,11 @@ for k = 1:size(dataTable,1)
         data.scale.z = 2;
     end
     
+    directory = dataTable.Path{k}(1:end-11);
+    mkdir(directory, 'preliminary figures')
+    filename = [directory '\preliminary figures\' dataTable.Label{k} '.png'];
+    filenamepdf = [directory '\preliminary figures\' dataTable.Category{k} '.pdf'];
+    
     data.scale.x = 0.34;
     data.scale.y = 0.34;
     data.scale.z = 1;
@@ -136,6 +141,7 @@ for k = 1:size(dataTable,1)
         x = [xlim(2)-50-xgap,xlim(2)-xgap];
         y = [ylim(2)-ygap, ylim(2)-ygap];
         plot(x,y, 'w-', 'LineWidth', 3)
+        title(dataTable.Category{k},'position', [1,1],'HorizontalAlignment','left','FontSize',11)
         
         N = N + 1;
     end
@@ -396,11 +402,7 @@ for k = 1:size(dataTable,1)
         y = [ylim(2)-ygap, ylim(2)-ygap];
         plot(x,y, 'w-', 'LineWidth', 3)
     end
-    
-    directory = dataTable.Path{k}(1:end-11);
-    mkdir(directory, 'preliminary figures')
-    filename = [directory '\preliminary figures\' dataTable.Label{k} '.png'];
-    filenamepdf = [directory '\preliminary figures\' dataTable.Category{k} '.pdf'];
+
     export_fig(filename);
     if exist(filenamepdf, 'file')
         export_fig(filenamepdf, '-append')

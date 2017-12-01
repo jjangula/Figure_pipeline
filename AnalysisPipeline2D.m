@@ -5,7 +5,7 @@ close all
 settings = prepareWorkspace;
 dataTable = getLabels(settings);
 category = categorical(dataTable.Category);
-dataTable = dataTable(16:23,:);
+dataTable = dataTable(100:117,:);
 
 settings.xyN = 500;
 settings.force = true;
